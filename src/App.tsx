@@ -1,5 +1,5 @@
 import React from "react";
-import { TimeIcon } from "@chakra-ui/icons";
+import { TimeIcon, SmallCloseIcon } from "@chakra-ui/icons";
 import { Input, Box, Flex, List, ListItem, Text } from "@chakra-ui/react";
 import { getTimeSlots } from "./utils";
 import "./styles.css";
@@ -157,6 +157,13 @@ const ChakraTimePicker = () => {
   const [hours, setHours] = React.useState<string | undefined>(undefined);
   const [minutes, setMinutes] = React.useState<string | undefined>(undefined);
 
+  const notEmpty = () => !!hours && !!minutes;
+
+  const clearValues = () => {
+    setHours(undefined);
+    setMinutes(undefined);
+  };
+
   return (
     <Box
       ref={containerRef}
@@ -175,6 +182,9 @@ const ChakraTimePicker = () => {
         parentRef={containerRef}
         setShowTimeline={setShowTimeline}
       />
+      {notEmpty() && (
+        <SmallCloseIcon onClick={clearValues} _hover={{ cursor: "pointer" }} />
+      )}
       <Box w="50px" h="100%" position="relative">
         <TimePicker
           onPassHours={setHours}
