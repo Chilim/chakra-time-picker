@@ -1,0 +1,14 @@
+.App {
+  padding: 50px 50px;
+  font-family: sans-serif;
+}
+
+.custom-scrollbar {
+  scrollbar-color: transparent;
+  scrollbar-width: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 0;
+  scrollbar-color: transparent;
+}
