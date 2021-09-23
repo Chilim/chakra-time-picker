@@ -27,7 +27,7 @@ const TimeLine = ({
   };
 
   return (
-    <List overflowY="auto" w="100%" className="custom-scrollbar" p="10px">
+    <List overflowY="auto" w="100%" className="custom-scrollbar" m="10px">
       {rows.map((value, idx) => (
         <ListItem
           onClick={handleClick}
@@ -48,13 +48,16 @@ const TimeLine = ({
 const TimePicker = ({
   parentRef,
   onPassHours,
-  onPassMinutes
+  onPassMinutes,
+  showTimeline,
+  setShowTimeline
 }: {
   parentRef: React.RefObject<HTMLDivElement>;
   onPassHours: (value: string) => void;
   onPassMinutes: (value: string) => void;
+  showTimeline: boolean;
+  setShowTimeline: (pred: boolean) => void;
 }) => {
-  const [showTimeline, setShowTimeline] = React.useState(false);
   const [hours, setHours] = React.useState<string | undefined>(undefined);
   const [minutes, setMinutes] = React.useState<string | undefined>(undefined);
 
@@ -64,8 +67,10 @@ const TimePicker = ({
     const hideTimeLine = (e: MouseEvent) => {
       if (parentRef.current && !parentRef.current.contains(e.target as Node)) {
         setShowTimeline(false);
-        if (hours && minutes) {
+        if (hours) {
           onPassHours(hours);
+        }
+        if (minutes) {
           onPassMinutes(minutes);
         }
         setHours(undefined);
@@ -121,12 +126,12 @@ const TimePicker = ({
 
 const TimeInput = ({
   value,
-  onChangeValue,
-  unit
+  parentRef,
+  setShowTimeline
 }: {
   value: string | undefined;
-  onChangeValue: (value: string) => void;
-  unit: TimeUnit;
+  parentRef: React.RefObject<HTMLDivElement>;
+  setShowTimeline: (pred: boolean) => void;
 }) => {
   const getValue = () => {
     return value ? value : "--";
@@ -137,7 +142,7 @@ const TimeInput = ({
       w="50px"
       pattern="[0-9]{2}"
       value={getValue()}
-      // onChange={handleOnChange}
+      onClick={() => setShowTimeline(true)}
       style={{
         borderColor: "transparent",
         boxShadow: "none"
@@ -148,16 +153,9 @@ const TimeInput = ({
 
 const ChakraTimePicker = () => {
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const [showTimeline, setShowTimeline] = React.useState(false);
   const [hours, setHours] = React.useState<string | undefined>(undefined);
   const [minutes, setMinutes] = React.useState<string | undefined>(undefined);
-
-  const handleChangeHours = (value: string) => {
-    setHours(value);
-  };
-
-  const handleChangeMinutes = (value: string) => {
-    setMinutes(value);
-  };
 
   return (
     <Box
@@ -166,18 +164,24 @@ const ChakraTimePicker = () => {
       display="inline-flex"
       border="2px solid #084F8F"
     >
-      <TimeInput value={hours} onChangeValue={handleChangeHours} unit="hours" />
+      <TimeInput
+        value={hours}
+        parentRef={containerRef}
+        setShowTimeline={setShowTimeline}
+      />
       <Text>:</Text>
       <TimeInput
         value={minutes}
-        onChangeValue={handleChangeMinutes}
-        unit="minutes"
+        parentRef={containerRef}
+        setShowTimeline={setShowTimeline}
       />
       <Box w="50px" h="100%" position="relative">
         <TimePicker
           onPassHours={setHours}
           onPassMinutes={setMinutes}
           parentRef={containerRef}
+          showTimeline={showTimeline}
+          setShowTimeline={setShowTimeline}
         />
       </Box>
     </Box>
@@ -187,7 +191,7 @@ const ChakraTimePicker = () => {
 export default function App() {
   return (
     <div style={{ textAlign: "center", paddingTop: "250px" }}>
-      <div>Som smaple text to test positioning</div>
+      <div>Some sample text to test positioning</div>
       <ChakraTimePicker />
     </div>
   );
