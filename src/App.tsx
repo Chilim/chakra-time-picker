@@ -46,13 +46,14 @@ const TimeLine = ({
 };
 
 const TimePicker = ({
+  parentRef,
   onPassHours,
   onPassMinutes
 }: {
+  parentRef: React.RefObject<HTMLDivElement>;
   onPassHours: (value: string) => void;
   onPassMinutes: (value: string) => void;
 }) => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
   const [showTimeline, setShowTimeline] = React.useState(false);
   const [hours, setHours] = React.useState<string | undefined>(undefined);
   const [minutes, setMinutes] = React.useState<string | undefined>(undefined);
@@ -61,10 +62,7 @@ const TimePicker = ({
 
   React.useEffect(() => {
     const hideTimeLine = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
+      if (parentRef.current && !parentRef.current.contains(e.target as Node)) {
         setShowTimeline(false);
         if (hours && minutes) {
           onPassHours(hours);
@@ -83,7 +81,6 @@ const TimePicker = ({
 
   return (
     <Box
-      ref={containerRef}
       h="100%"
       display="inline-flex"
       position="absolute"
@@ -134,20 +131,6 @@ const TimeInput = ({
   const getValue = () => {
     return value ? value : "--";
   };
-  // const lastVal = unit === "hours" ? 23 : 59;
-
-  // const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const val = Number(e.target.value);
-  //   if (Number(val) > lastVal) {
-  //     onChangeValue("00");
-  //     return;
-  //   }
-  //   if (val < 10) {
-  //     onChangeValue(`0${val}`);
-  //     return;
-  //   }
-  //   return onChangeValue(`${val}`);
-  // };
 
   return (
     <Input
@@ -164,6 +147,7 @@ const TimeInput = ({
 };
 
 const ChakraTimePicker = () => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const [hours, setHours] = React.useState<string | undefined>(undefined);
   const [minutes, setMinutes] = React.useState<string | undefined>(undefined);
 
@@ -176,7 +160,12 @@ const ChakraTimePicker = () => {
   };
 
   return (
-    <Box alignItems="center" display="inline-flex" border="2px solid #084F8F">
+    <Box
+      ref={containerRef}
+      alignItems="center"
+      display="inline-flex"
+      border="2px solid #084F8F"
+    >
       <TimeInput value={hours} onChangeValue={handleChangeHours} unit="hours" />
       <Text>:</Text>
       <TimeInput
@@ -185,7 +174,11 @@ const ChakraTimePicker = () => {
         unit="minutes"
       />
       <Box w="50px" h="100%" position="relative">
-        <TimePicker onPassHours={setHours} onPassMinutes={setMinutes} />
+        <TimePicker
+          onPassHours={setHours}
+          onPassMinutes={setMinutes}
+          parentRef={containerRef}
+        />
       </Box>
     </Box>
   );
