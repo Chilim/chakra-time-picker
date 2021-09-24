@@ -33,9 +33,14 @@ const TimeLine = ({
           onClick={handleClick}
           key={idx}
           bg={value === selected ? "#106dc4" : "inherit"}
+          color={value === selected ? "#ffffff" : "inherit"}
+          fontWeight={value === selected ? "bold" : "inherit"}
           _hover={{
             backgroundColor: "#7cb9f2",
             cursor: "pointer"
+          }}
+          _active={{
+            backgroundColor: value === selected ? "#106dc4" : "inherit"
           }}
         >
           {value}
@@ -85,13 +90,7 @@ const TimePicker = ({
   const handleShowTimeline = () => setShowTimeline(true);
 
   return (
-    <Box
-      h="100%"
-      display="inline-flex"
-      position="absolute"
-      right="10px"
-      alignItems="center"
-    >
+    <Box h="100%" display="inline-flex" right="10px" alignItems="center">
       <TimeIcon onClick={handleShowTimeline} />
       <Box position="relative" display={showTimeline ? "block" : "none"}>
         <Flex
@@ -126,11 +125,9 @@ const TimePicker = ({
 
 const TimeInput = ({
   value,
-  parentRef,
   setShowTimeline
 }: {
   value: string | undefined;
-  parentRef: React.RefObject<HTMLDivElement>;
   setShowTimeline: (pred: boolean) => void;
 }) => {
   const getValue = () => {
@@ -139,7 +136,8 @@ const TimeInput = ({
 
   return (
     <Input
-      w="50px"
+      w="20px"
+      p="1px 0px"
       pattern="[0-9]{2}"
       value={getValue()}
       onClick={() => setShowTimeline(true)}
@@ -169,23 +167,31 @@ const ChakraTimePicker = () => {
       ref={containerRef}
       alignItems="center"
       display="inline-flex"
-      border="2px solid #084F8F"
+      border="1px solid #084F8F"
+      borderRadius="5px"
+      h="42px"
+      minW="125px"
     >
-      <TimeInput
-        value={hours}
-        parentRef={containerRef}
-        setShowTimeline={setShowTimeline}
-      />
-      <Text>:</Text>
-      <TimeInput
-        value={minutes}
-        parentRef={containerRef}
-        setShowTimeline={setShowTimeline}
-      />
-      {notEmpty() && (
-        <SmallCloseIcon onClick={clearValues} _hover={{ cursor: "pointer" }} />
-      )}
-      <Box w="50px" h="100%" position="relative">
+      <Flex alignItems="center" pl="10px" flex={3}>
+        <TimeInput value={hours} setShowTimeline={setShowTimeline} />
+        <Text>:</Text>
+        <TimeInput value={minutes} setShowTimeline={setShowTimeline} />
+      </Flex>
+      <Flex
+        w="16px"
+        h="100%"
+        alignItems="center"
+        align="center"
+        justify="center"
+      >
+        {notEmpty() && (
+          <SmallCloseIcon
+            onClick={clearValues}
+            _hover={{ cursor: "pointer" }}
+          />
+        )}
+      </Flex>
+      <Flex w="30px" h="100%" align="center" justify="center">
         <TimePicker
           onPassHours={setHours}
           onPassMinutes={setMinutes}
@@ -193,7 +199,7 @@ const ChakraTimePicker = () => {
           showTimeline={showTimeline}
           setShowTimeline={setShowTimeline}
         />
-      </Box>
+      </Flex>
     </Box>
   );
 };
