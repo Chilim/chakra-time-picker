@@ -90,7 +90,7 @@ const TimePicker = ({
   const handleShowTimeline = () => setShowTimeline(true);
 
   return (
-    <Box h="100%" display="inline-flex" right="10px" alignItems="center">
+    <Box h="100%" display="inline-flex" alignItems="center">
       <TimeIcon onClick={handleShowTimeline} />
       <Box position="relative" display={showTimeline ? "block" : "none"}>
         <Flex
@@ -99,7 +99,7 @@ const TimePicker = ({
           position="absolute"
           bg="#ffffff"
           bottom="25px"
-          right="-10px"
+          right="-5px"
           className="scrollbar-invisible"
           border="1px solid #084F8F"
           borderTopLeftRadius="5px"
@@ -125,22 +125,59 @@ const TimePicker = ({
 
 const TimeInput = ({
   value,
-  setShowTimeline
+  setShowTimeline,
+  onPassValue,
+  shallClear
 }: {
   value: string | undefined;
   setShowTimeline: (pred: boolean) => void;
+  onPassValue: (value: string) => void;
+  shallClear: boolean;
 }) => {
-  const getValue = () => {
-    return value ? value : "--";
+  const [state, setState] = React.useState(() => ({
+    inputValue: value ?? "--",
+    count: 0
+  }));
+
+  React.useEffect(() => {
+    if (value) {
+      setState((prev) => ({ ...prev, inputValue: value }));
+    }
+  }, [value]);
+
+  React.useEffect(() => {
+    if (shallClear) {
+      setState(() => ({ count: 0, inputValue: "--" }));
+    }
+  }, [shallClear]);
+
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleClick = () => {
+    setShowTimeline(true);
+    if (inputRef) {
+      inputRef.current?.select();
+    }
+  };
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const chars = [...state.inputValue];
+    const pos = state.count % 2 === 0 ? 0 : 1;
+    chars.splice(pos, 1, e.target.value);
+    const joined = chars.join();
+    console.log("joined: ", joined);
   };
 
   return (
     <Input
+      ref={inputRef}
       w="20px"
       p="1px 0px"
       pattern="[0-9]{2}"
-      value={getValue()}
-      onClick={() => setShowTimeline(true)}
+      value={state.inputValue}
+      onClick={handleClick}
+      onChange={handleOnChange}
+      placeholder="--"
       style={{
         borderColor: "transparent",
         boxShadow: "none"
@@ -154,12 +191,14 @@ const ChakraTimePicker = () => {
   const [showTimeline, setShowTimeline] = React.useState(false);
   const [hours, setHours] = React.useState<string | undefined>(undefined);
   const [minutes, setMinutes] = React.useState<string | undefined>(undefined);
+  const [shallClear, setShallClear] = React.useState(false);
 
   const notEmpty = () => !!hours && !!minutes;
 
-  const clearValues = () => {
+  const clearTime = () => {
     setHours(undefined);
     setMinutes(undefined);
+    setShallClear(true);
   };
 
   return (
@@ -173,9 +212,19 @@ const ChakraTimePicker = () => {
       minW="125px"
     >
       <Flex alignItems="center" pl="10px" flex={3}>
-        <TimeInput value={hours} setShowTimeline={setShowTimeline} />
+        <TimeInput
+          value={hours}
+          setShowTimeline={setShowTimeline}
+          onPassValue={setHours}
+          shallClear={shallClear}
+        />
         <Text>:</Text>
-        <TimeInput value={minutes} setShowTimeline={setShowTimeline} />
+        <TimeInput
+          value={minutes}
+          setShowTimeline={setShowTimeline}
+          onPassValue={setMinutes}
+          shallClear={shallClear}
+        />
       </Flex>
       <Flex
         w="16px"
@@ -185,10 +234,7 @@ const ChakraTimePicker = () => {
         justify="center"
       >
         {notEmpty() && (
-          <SmallCloseIcon
-            onClick={clearValues}
-            _hover={{ cursor: "pointer" }}
-          />
+          <SmallCloseIcon onClick={clearTime} _hover={{ cursor: "pointer" }} />
         )}
       </Flex>
       <Flex w="30px" h="100%" align="center" justify="center">

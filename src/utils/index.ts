@@ -13,16 +13,23 @@ const getDateFromTime = (time: string) => {
   );
 };
 
-export const toTimeFormat = (time: number) => {
+export const toTimeStringFormat = (time: number) => {
   if (time >= 10) return time;
   return `0${time}`;
 };
 
-const getDateFromHours = (time: string) => {
+const formatTimeString = (time: string) => {
   const date = getDateFromTime(time);
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  return `${toTimeFormat(hours)}:${toTimeFormat(minutes)}`;
+  return `${toTimeStringFormat(hours)}:${toTimeStringFormat(minutes)}`;
+};
+
+export const getTimeUnitStr = (time: string, unit: "hours" | "minutes") => {
+  const [hours, minutes] = time.split(":");
+  return unit === "hours"
+    ? `${toTimeStringFormat(Number(hours))}`
+    : `${toTimeStringFormat(Number(minutes))}`;
 };
 
 const addMinutes = (step: number, prevTime: string) => {
@@ -36,8 +43,9 @@ const addMinutes = (step: number, prevTime: string) => {
   } else {
     newMinutes = prevMinutes + step;
   }
-
-  return `${toTimeFormat(prevHours + left)}:${toTimeFormat(newMinutes)}`;
+  return `${toTimeStringFormat(prevHours + left)}:${toTimeStringFormat(
+    newMinutes
+  )}`;
 };
 
 export const getTimeSlots = (step: number) => {
@@ -47,9 +55,8 @@ export const getTimeSlots = (step: number) => {
   const timeLine = [];
   for (let i = 0; i < rowsNumber; i += 1) {
     if (i === 0) {
-      const time = getDateFromHours(start);
-      timeLine.push(time);
-      prevTime = time;
+      timeLine.push(start);
+      prevTime = start;
     } else {
       const time = addMinutes(step, prevTime);
       timeLine.push(time);
