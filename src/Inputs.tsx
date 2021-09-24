@@ -4,14 +4,16 @@ import {
   incrementHours,
   decrementHours,
   incrementMinutes,
-  decrementMinutes
+  decrementMinutes,
+  shouldSkipAsap,
+  setNewHours
 } from "./utils";
 
 type Props = {
   hours: string | undefined;
   minutes: string | undefined;
-  setHours: (value: string) => void;
-  setMinutes: (value: string) => void;
+  setHours: (value: string | undefined) => void;
+  setMinutes: (value: string | undefined) => void;
   shallClear: boolean;
 };
 
@@ -22,35 +24,36 @@ const Inputs = ({
   setMinutes,
   shallClear
 }: Props) => {
-  const [localMinutes, setLocalMinutes] = React.useState(() =>
-    minutes ? [...minutes] : ["-", "-"]
-  );
-
-  const [localHours, setLocalHours] = React.useState(() =>
-    hours ? [...hours] : ["-", "-"]
-  );
+  const localMinutes = minutes ? [...minutes] : ["-", "-"];
+  const localHours = hours ? [...hours] : ["-", "-"];
+  const [skip, setSkip] = React.useState(false);
+  const [idx, setIndex] = React.useState(0);
 
   const hoursRef = React.useRef<HTMLInputElement>(null);
   const minutesRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (hours) {
-      setLocalHours(() => [...hours]);
+    if (idx > 1) {
+      setIndex(0);
+      setSkip(true);
     }
-  }, [hours]);
+  }, [idx]);
 
   React.useEffect(() => {
-    if (minutes) {
-      setLocalMinutes(() => [...minutes]);
+    if (skip) {
+      minutesRef.current?.select();
+      setIndex(0);
+      setSkip(false);
     }
-  }, [minutes]);
+  }, [skip]);
 
   React.useEffect(() => {
     if (shallClear) {
-      setLocalHours(() => ["-", "-"]);
-      setLocalMinutes(() => ["-", "-"]);
+      setHours(undefined);
+      setMinutes(undefined);
+      setIndex(0);
     }
-  }, [shallClear]);
+  }, [shallClear, setHours, setMinutes]);
 
   const handleSelect = (unit: "hours" | "minutes") => {
     if (hoursRef && unit === "hours") {
@@ -70,30 +73,40 @@ const Inputs = ({
     unit: "hours" | "minutes"
   ) => {
     const key = e.key;
+    let newValue: string;
 
-    const currentState = unit === "hours" ? localHours : localMinutes;
-    const currentDispatch = unit === "hours" ? setLocalHours : setLocalMinutes;
+    const currentValue = unit === "hours" ? localHours : localMinutes;
+    const adjusted =
+      currentValue.join("") === "--" ? "00" : currentValue.join("");
     const remoteDispatch = unit === "hours" ? setHours : setMinutes;
     const increase = unit === "hours" ? incrementHours : incrementMinutes;
     const decrease = unit === "hours" ? decrementHours : decrementMinutes;
 
     if (key === "ArrowUp") {
-      const newValue = increase(currentState.join(""));
-      currentDispatch([...newValue]);
+      newValue = increase(adjusted);
+      remoteDispatch(newValue);
       return;
     }
 
     if (key === "ArrowDown") {
-      const newValue = decrease(currentState.join(""));
-      currentDispatch([...newValue]);
+      newValue = decrease(adjusted);
+      remoteDispatch(newValue);
       return;
     }
 
-    if (!key.match(/[0-9]{1,2}/)) return;
+    if (key.match(/[0-9]{1,2}/)) {
+      if (shouldSkipAsap(key, idx)) {
+        setIndex(0);
+        setSkip(true);
+        remoteDispatch(`0${key}`);
+        return;
+      }
 
-    const [, ...rest] = currentState;
-    const updated = rest.concat(key);
-    currentDispatch(updated);
+      newValue = setNewHours(adjusted, key, idx);
+      remoteDispatch(newValue);
+      setIndex((prev) => (prev += 1));
+      return;
+    }
   };
 
   return (

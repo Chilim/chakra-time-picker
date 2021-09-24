@@ -1,6 +1,6 @@
 import React from "react";
-import { TimeIcon, SmallCloseIcon, CheckCircleIcon } from "@chakra-ui/icons";
-import { Input, Box, Flex, List, ListItem, Text } from "@chakra-ui/react";
+import { TimeIcon, SmallCloseIcon } from "@chakra-ui/icons";
+import { Box, Flex, List, ListItem } from "@chakra-ui/react";
 import Inputs from "./Inputs";
 import { getTimeSlots } from "./utils";
 import "./styles.css";
@@ -131,7 +131,7 @@ const ChakraTimePicker = () => {
   const [minutes, setMinutes] = React.useState<string | undefined>(undefined);
   const [shallClear, setShallClear] = React.useState(false);
 
-  const notEmpty = () => !!hours && !!minutes;
+  const notEmpty = () => !!hours || !!minutes;
 
   const clearTime = () => {
     setHours(undefined);

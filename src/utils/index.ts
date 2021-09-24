@@ -1,5 +1,5 @@
-const minutesInHour = 60;
-const hoursInDay = 24;
+export const minutesInHour = 60;
+export const hoursInDay = 24;
 
 export const toTimeStringFormat = (time: number) => {
   if (time >= 10) return time.toString();
@@ -70,4 +70,23 @@ export const getTimeSlots = (step: number) => {
   }
 
   return timeLine;
+};
+
+export const shouldSkipAsap = (input: string, currentIdx: number) => {
+  return Number(`${input}0`) > hoursInDay && currentIdx === 0;
+};
+
+export const setNewHours = (
+  currentVal: string,
+  input: string,
+  currentIdx: number
+) => {
+  if (currentIdx === 0) return `0${input}`;
+  const [, secondVal] = [...currentVal];
+  const newVal = [secondVal, input].join("");
+  if (Number(newVal) === hoursInDay) return "00";
+  if (Number(newVal) > hoursInDay)
+    return toTimeStringFormat(Number(newVal) - hoursInDay);
+
+  return newVal;
 };
