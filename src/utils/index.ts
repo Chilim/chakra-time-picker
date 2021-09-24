@@ -1,28 +1,33 @@
-const minutesInHour = 60;
-const hoursInDay = 24;
-
-const getDateFromTime = (time: string) => {
-  const stime = time.split(":").map(Number);
-  const now = new Date();
-  return new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    stime[0],
-    stime[1]
-  );
-};
+export const minutesInHour = 60;
+export const hoursInDay = 24;
 
 export const toTimeStringFormat = (time: number) => {
-  if (time >= 10) return time;
+  if (time >= 10) return time.toString();
   return `0${time}`;
 };
 
-const formatTimeString = (time: string) => {
-  const date = getDateFromTime(time);
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  return `${toTimeStringFormat(hours)}:${toTimeStringFormat(minutes)}`;
+export const incrementHours = (current: string) => {
+  const num = Number(current) + 1;
+  if (num === hoursInDay) return "00";
+  return toTimeStringFormat(num);
+};
+
+export const decrementHours = (current: string) => {
+  const num = Number(current) - 1;
+  if (num < 0) return `${hoursInDay - 1}`;
+  return toTimeStringFormat(num);
+};
+
+export const incrementMinutes = (current: string) => {
+  const num = Number(current) + 1;
+  if (num === minutesInHour) return "00";
+  return toTimeStringFormat(num);
+};
+
+export const decrementMinutes = (current: string) => {
+  const num = Number(current) - 1;
+  if (num < 0) return `${minutesInHour - 1}`;
+  return toTimeStringFormat(num);
 };
 
 export const getTimeUnitStr = (time: string, unit: "hours" | "minutes") => {
@@ -65,4 +70,23 @@ export const getTimeSlots = (step: number) => {
   }
 
   return timeLine;
+};
+
+export const shouldSkipAsap = (input: string, currentIdx: number) => {
+  return Number(`${input}0`) > hoursInDay && currentIdx === 0;
+};
+
+export const setNewHours = (
+  currentVal: string,
+  input: string,
+  currentIdx: number
+) => {
+  if (currentIdx === 0) return `0${input}`;
+  const [, secondVal] = [...currentVal];
+  const newVal = [secondVal, input].join("");
+  if (Number(newVal) === hoursInDay) return "00";
+  if (Number(newVal) > hoursInDay)
+    return toTimeStringFormat(Number(newVal) - hoursInDay);
+
+  return newVal;
 };

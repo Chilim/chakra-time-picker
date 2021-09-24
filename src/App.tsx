@@ -1,6 +1,7 @@
 import React from "react";
 import { TimeIcon, SmallCloseIcon } from "@chakra-ui/icons";
-import { Input, Box, Flex, List, ListItem, Text } from "@chakra-ui/react";
+import { Box, Flex, List, ListItem } from "@chakra-ui/react";
+import Inputs from "./Inputs";
 import { getTimeSlots } from "./utils";
 import "./styles.css";
 
@@ -123,69 +124,6 @@ const TimePicker = ({
   );
 };
 
-const TimeInput = ({
-  value,
-  setShowTimeline,
-  onPassValue,
-  shallClear
-}: {
-  value: string | undefined;
-  setShowTimeline: (pred: boolean) => void;
-  onPassValue: (value: string) => void;
-  shallClear: boolean;
-}) => {
-  const [state, setState] = React.useState(() => ({
-    inputValue: value ?? "--",
-    count: 0
-  }));
-
-  React.useEffect(() => {
-    if (value) {
-      setState((prev) => ({ ...prev, inputValue: value }));
-    }
-  }, [value]);
-
-  React.useEffect(() => {
-    if (shallClear) {
-      setState(() => ({ count: 0, inputValue: "--" }));
-    }
-  }, [shallClear]);
-
-  const inputRef = React.useRef<HTMLInputElement>(null);
-
-  const handleClick = () => {
-    setShowTimeline(true);
-    if (inputRef) {
-      inputRef.current?.select();
-    }
-  };
-
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const chars = [...state.inputValue];
-    const pos = state.count % 2 === 0 ? 0 : 1;
-    chars.splice(pos, 1, e.target.value);
-    const joined = chars.join();
-    console.log("joined: ", joined);
-  };
-
-  return (
-    <Input
-      ref={inputRef}
-      w="20px"
-      p="1px 0px"
-      pattern="[0-9]{2}"
-      value={state.inputValue}
-      onClick={handleClick}
-      onChange={handleOnChange}
-      placeholder="--"
-      style={{
-        borderColor: "transparent",
-        boxShadow: "none"
-      }}
-    />
-  );
-};
-
 const ChakraTimePicker = () => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [showTimeline, setShowTimeline] = React.useState(false);
@@ -193,7 +131,7 @@ const ChakraTimePicker = () => {
   const [minutes, setMinutes] = React.useState<string | undefined>(undefined);
   const [shallClear, setShallClear] = React.useState(false);
 
-  const notEmpty = () => !!hours && !!minutes;
+  const notEmpty = () => !!hours || !!minutes;
 
   const clearTime = () => {
     setHours(undefined);
@@ -211,27 +149,20 @@ const ChakraTimePicker = () => {
       h="42px"
       minW="125px"
     >
-      <Flex alignItems="center" pl="10px" flex={3}>
-        <TimeInput
-          value={hours}
-          setShowTimeline={setShowTimeline}
-          onPassValue={setHours}
-          shallClear={shallClear}
-        />
-        <Text>:</Text>
-        <TimeInput
-          value={minutes}
-          setShowTimeline={setShowTimeline}
-          onPassValue={setMinutes}
-          shallClear={shallClear}
-        />
-      </Flex>
+      <Inputs
+        hours={hours}
+        minutes={minutes}
+        setHours={setHours}
+        setMinutes={setMinutes}
+        shallClear={shallClear}
+      />
       <Flex
         w="16px"
         h="100%"
         alignItems="center"
         align="center"
         justify="center"
+        name="minutes"
       >
         {notEmpty() && (
           <SmallCloseIcon onClick={clearTime} _hover={{ cursor: "pointer" }} />
