@@ -67,7 +67,7 @@ const TimePicker = ({
   const [hours, setHours] = React.useState<string | undefined>(undefined);
   const [minutes, setMinutes] = React.useState<string | undefined>(undefined);
 
-  const rows = getTimeSlots(5);
+  const rows = getTimeSlots(35);
 
   React.useEffect(() => {
     const hideTimeLine = (e: MouseEvent) => {
