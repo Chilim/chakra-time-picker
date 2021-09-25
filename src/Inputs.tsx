@@ -6,7 +6,7 @@ import {
   incrementMinutes,
   decrementMinutes,
   shouldSkipAsap,
-  setNewHours
+  setNewTime
 } from "./utils";
 
 type Props = {
@@ -95,14 +95,14 @@ const Inputs = ({
     }
 
     if (key.match(/[0-9]{1,2}/)) {
-      if (shouldSkipAsap(key, idx)) {
+      if (shouldSkipAsap(key, idx, unit)) {
         setIndex(0);
         setSkip(true);
         remoteDispatch(`0${key}`);
         return;
       }
 
-      newValue = setNewHours(adjusted, key, idx);
+      newValue = setNewTime(adjusted, key, idx, unit);
       remoteDispatch(newValue);
       setIndex((prev) => (prev += 1));
       return;

@@ -72,21 +72,34 @@ export const getTimeSlots = (step: number) => {
   return timeLine;
 };
 
-export const shouldSkipAsap = (input: string, currentIdx: number) => {
+export const shouldSkipAsap = (
+  input: string,
+  currentIdx: number,
+  unit: "hours" | "minutes"
+) => {
+  if (unit === "minutes") {
+    return Number(`${input}0`) > minutesInHour && currentIdx === 0;
+  }
   return Number(`${input}0`) > hoursInDay && currentIdx === 0;
 };
 
-export const setNewHours = (
+export const setNewTime = (
   currentVal: string,
   input: string,
-  currentIdx: number
+  currentIdx: number,
+  unit: "hours" | "minutes"
 ) => {
   if (currentIdx === 0) return `0${input}`;
   const [, secondVal] = [...currentVal];
   const newVal = [secondVal, input].join("");
-  if (Number(newVal) === hoursInDay) return "00";
-  if (Number(newVal) > hoursInDay)
+  if (Number(newVal) === hoursInDay && unit === "hours") return "00";
+  if (Number(newVal) === minutesInHour && unit === "minutes") return "00";
+  if (Number(newVal) > hoursInDay && unit === "hours") {
     return toTimeStringFormat(Number(newVal) - hoursInDay);
+  }
+  if (Number(newVal) > minutesInHour && unit === "minutes") {
+    return toTimeStringFormat(Number(newVal) - hoursInDay);
+  }
 
   return newVal;
 };
