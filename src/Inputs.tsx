@@ -126,7 +126,7 @@ const Inputs = ({
           boxShadow: "none"
         }}
       />
-      <Text>:</Text>
+      <Text pr="3px">:</Text>
       <Input
         ref={minutesRef}
         w="20px"
