@@ -1,5 +1,5 @@
 import React from "react";
-import { Input, Flex, Text } from "@chakra-ui/react";
+import { Input, Flex, Text, FlexProps } from "@chakra-ui/react";
 import {
   incrementHours,
   decrementHours,
@@ -9,21 +9,27 @@ import {
   setNewTime
 } from "./utils";
 
-type Props = {
+interface Props extends FlexProps {
   hours: string | undefined;
   minutes: string | undefined;
   setHours: (value: string | undefined) => void;
   setMinutes: (value: string | undefined) => void;
   shallClear: boolean;
-};
+  isReadOnly?: boolean;
+  isDisabled?: boolean;
+}
 
-const Inputs = ({
-  hours,
-  minutes,
-  setHours,
-  setMinutes,
-  shallClear
-}: Props) => {
+const Inputs = (props: Props) => {
+  const {
+    hours,
+    minutes,
+    setHours,
+    setMinutes,
+    shallClear,
+    isReadOnly,
+    isDisabled,
+    ...rest
+  } = props;
   const localMinutes = minutes ? [...minutes] : ["-", "-"];
   const localHours = hours ? [...hours] : ["-", "-"];
   const [skip, setSkip] = React.useState(false);
@@ -64,7 +70,7 @@ const Inputs = ({
     }
   };
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = () => {
     return;
   };
 
@@ -110,9 +116,11 @@ const Inputs = ({
   };
 
   return (
-    <Flex alignItems="center" pl="10px" flex={3}>
+    <Flex alignItems="center" pl="10px" flex={3} position="relative" {...rest}>
       <Input
         ref={hoursRef}
+        isReadOnly={isReadOnly}
+        isDisabled={isDisabled}
         w="20px"
         p="1px 0px"
         pattern="[0-9]{1,2}"
@@ -128,6 +136,8 @@ const Inputs = ({
       />
       <Text pr="3px">:</Text>
       <Input
+        isReadOnly={isReadOnly}
+        isDisabled={isDisabled}
         ref={minutesRef}
         w="20px"
         p="1px 0px"
