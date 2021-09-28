@@ -1,7 +1,7 @@
 import React from "react";
 import { TimeIcon, SmallCloseIcon } from "@chakra-ui/icons";
-import { Box, Flex, List, ListItem } from "@chakra-ui/react";
-import Inputs from "./Inputs";
+import { Box, Flex, List, ListItem, Input, InputProps } from "@chakra-ui/react";
+import TimeInput from "./Input";
 import { getTimeSlots } from "./utils";
 import "./styles.css";
 
@@ -124,7 +124,9 @@ const TimePicker = ({
   );
 };
 
-const ChakraTimePicker = () => {
+interface ChakraTimePickerProps extends InputProps {}
+
+const ChakraTimePicker = (props: ChakraTimePickerProps) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [showTimeline, setShowTimeline] = React.useState(false);
   const [hours, setHours] = React.useState<string | undefined>(undefined);
@@ -139,17 +141,29 @@ const ChakraTimePicker = () => {
     setShallClear(true);
   };
 
+  const getInputValues = () => {
+    if (!hours || !minutes) return undefined;
+    return `${hours}${minutes}`;
+  };
+
   return (
     <Box
+      position="relative"
       ref={containerRef}
       alignItems="center"
       display="inline-flex"
-      border="1px solid #084F8F"
-      borderRadius="5px"
-      h="42px"
-      minW="125px"
     >
-      <Inputs
+      <Input
+        {...props}
+        fontSize="0"
+        w="130px"
+        borderColor="#084F8F"
+        value={getInputValues()}
+        h="42px"
+        bg="transparent"
+      />
+      <TimeInput
+        position="absolute"
         hours={hours}
         minutes={minutes}
         setHours={setHours}
@@ -157,18 +171,24 @@ const ChakraTimePicker = () => {
         shallClear={shallClear}
       />
       <Flex
-        w="16px"
         h="100%"
         alignItems="center"
         align="center"
         justify="center"
-        name="minutes"
+        position="absolute"
+        right="40px"
       >
         {notEmpty() && (
           <SmallCloseIcon onClick={clearTime} _hover={{ cursor: "pointer" }} />
         )}
       </Flex>
-      <Flex w="30px" h="100%" align="center" justify="center">
+      <Flex
+        h="100%"
+        align="center"
+        justify="center"
+        position="absolute"
+        right="10px"
+      >
         <TimePicker
           onPassHours={setHours}
           onPassMinutes={setMinutes}
